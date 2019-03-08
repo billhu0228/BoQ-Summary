@@ -10,6 +10,10 @@ namespace BoQCore
 {
     public class Bridge
     {
+        // 构造物标识符ClassNum:
+        // 0:桥梁; 1:涵洞; 2:通道; 3:隧道; 4:左幅桥; 5:右幅桥; 6:左幅隧道; 7:右幅隧道; 8:平交口; 
+        // 9:左侧平交口; 10:右侧平交口
+        
         public int ClassNum;
         public string Name;
         public double ZH,Angle,LenA,LenB;
@@ -73,6 +77,8 @@ namespace BoQCore
             string[] xx;
             foreach (string item in ss)
             {
+
+
                 Bridge bridge = new Bridge();
                 if (item.StartsWith("//"))
                 {
@@ -81,10 +87,16 @@ namespace BoQCore
 
                 try
                 {
+
                     line = item.TrimEnd('\r');
                     xx = Regex.Split(line, @"\s+");
 
-                    
+                    if (int.Parse(xx[0]) != 0 && int.Parse(xx[0]) != 5 && int.Parse(xx[0]) != 6)
+                    {
+                        // 非桥梁
+                        continue;
+                    }
+
                     bridge.ClassNum = int.Parse(xx[0]);
                     bridge.Name = xx[1];
                     xx[2] = xx[2].Split('_')[0];

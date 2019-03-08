@@ -71,7 +71,7 @@ namespace Configuration
         /// </summary>
         /// <param name="pk">里程</param>
         /// <returns></returns>
-        public abstract double GetBridgeWidth(double pk);
+        public abstract double GetBridgeWidth(double pk,bool isleft);
 
         /// <summary>
         /// T梁片数算法

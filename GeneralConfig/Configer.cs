@@ -10,14 +10,14 @@ namespace Configuration
     public class Configer
     {
 
-        public GeneralConfig ConfigInstance;
+        public BasicConfig ConfigInstance;
 
 
         public Configer(string ss)
         {
             string fullName = "Configuration." + ss;//命名空间.类型名
             object ect = Assembly.Load("Configuration").CreateInstance(fullName);
-            ConfigInstance = (GeneralConfig)ect;
+            ConfigInstance = (BasicConfig)ect;
 
         }
        

@@ -43,7 +43,7 @@
   <ItemGroup>
     <Compile Include="BasicConfig.cs" />
     <Compile Include="Configer.cs" />
-    <Compile Include="E763Config.cs" />
+    <Compile Include="E763ConfigV2.cs" />
     <Compile Include="GeneralConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

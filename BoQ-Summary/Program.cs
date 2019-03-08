@@ -22,7 +22,7 @@ namespace BoQApplication
             
             // 调用配置器
             //Configer Bill = new Configer("E763Config");
-            Configer Bill = new Configer("GeneralConfig");
+            Configer Bill = new Configer("E763ConfigV2");
             Bill.ConfigInstance.BridgeList = LK_GZX;
             Bill.ConfigInstance.Dmx = LK_DMX;
             Bill.ConfigInstance.Sjx = LK_SQX;

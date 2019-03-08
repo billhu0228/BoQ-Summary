@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace Configuration
 {
-    public class GeneralConfig:BasicConfig
+    public class E763ConfigV2:BasicConfig
     {       
         
 
-        public GeneralConfig()
+        public E763ConfigV2()
         {
-            Name = "General";
+            Name = "E763ConfigV2";
         }
 
         
@@ -42,70 +42,76 @@ namespace Configuration
 
         public override void GenStrList( ref Bridge curBridge)
         {
+            string LR = curBridge.ClassNum == 0 ? "LR" : curBridge.ClassNum == 5 ? "L" : "R";
+
             Console.WriteLine(curBridge.Name);
 
             double h0, pk0, w0;
-            
-            w0 = GetBridgeWidth(curBridge.ZH);
 
-            for (int i = 0; i < curBridge.SpanList.Count+1; i++)
+            foreach (var item in LR)
             {
-                // 当前设计墩高
-                
-                double a = curBridge.SpanList.GetRange(0, i).Sum();
-                pk0 = curBridge.ZH - 0.5 * curBridge.Length + a;
-                h0=Sjx.GetBG(pk0) - Dmx.GetBG(pk0);
-                                             
-                // 获取结构类型
-                if (i==0)
-                {
-                    Globals.BeamType curBT = GetBeamType(i, ref curBridge);
-                    GetSupStr(out curSupStr, curBridge.SpanList[i],w0,curBT);                    
-                    int beamNum = GetTBeamNum(w0,curBT);
-                    curSupStr.WriteData(ref Record, curBridge.Name, beamNum);
+                bool isLeft = item == 'L' ? true : false;
+                w0 = GetBridgeWidth(curBridge.ZH, isLeft);
 
-                    GetAbutment(out Abutment curAbut, ref curSupStr, h0, w0);
-                    curAbut.WriteData(ref Record, curBridge.Name);
-                }
-                else if (i == curBridge.SpanList.Count)
+                for (int i = 0; i < curBridge.SpanList.Count + 1; i++)
                 {
-                    Globals.BeamType curBT = GetBeamType(i-1, ref curBridge);
-                    GetSupStr(out curSupStr, curBridge.SpanList[i - 1], w0, curBT);
+                    // 当前设计墩高
 
-                    GetAbutment(out Abutment curAbut, ref curSupStr,h0,w0);
-                    curAbut.WriteData(ref Record, curBridge.Name);
-                }
-                else
-                {
-                    Globals.BeamType curBT = GetBeamType(i, ref curBridge);
-                    GetSupStr(out curSupStr, curBridge.SpanList[i-1],w0,curBT);                    
-                    int beamNum = GetTBeamNum(w0, curBT);
-                    curSupStr.WriteData(ref Record, curBridge.Name, beamNum);
+                    double a = curBridge.SpanList.GetRange(0, i).Sum();
+                    pk0 = curBridge.ZH - 0.5 * curBridge.Length + a;
+                    h0 = Sjx.GetBG(pk0) - Dmx.GetBG(pk0);
 
-                    GetPier(out curPier,ref curSupStr, h0);
-                    if (curPier != null)
+                    // 获取结构类型
+                    if (i == 0)
                     {
-                        if (curPier.GetType()==typeof(SolidCirclePier))
-                        {
-                            curPier.WriteData(ref Record, curBridge.Name,3);
-                        }
-                        else
-                        {
-                            curPier.WriteData(ref Record, curBridge.Name);
-                        }
-                        
+                        Globals.BeamType curBT = GetBeamType(i, ref curBridge);
+                        GetSupStr(out curSupStr, curBridge.SpanList[i], w0, curBT);
+                        int beamNum = GetTBeamNum(w0, curBT);
+                        curSupStr.WriteData(ref Record, curBridge.Name, beamNum);
 
-                        GetCapBeam(out CapBeam curCB, w0);
-                        curCB.WriteData(ref Record, curBridge.Name);
-
-                        GetPileCap(out PileCap curPC,ref curSupStr,ref curPier);
-                        curPC.WriteData(ref Record, curBridge.Name);
-
-
-                        GetPile(out Pile curPile, curBridge.ZH);
-                        curPile.WriteData(ref Record, curBridge.Name);
+                        GetAbutment(out Abutment curAbut, ref curSupStr, h0, w0);
+                        curAbut.WriteData(ref Record, curBridge.Name);
                     }
-                }                
+                    else if (i == curBridge.SpanList.Count)
+                    {
+                        Globals.BeamType curBT = GetBeamType(i - 1, ref curBridge);
+                        GetSupStr(out curSupStr, curBridge.SpanList[i - 1], w0, curBT);
+
+                        GetAbutment(out Abutment curAbut, ref curSupStr, h0, w0);
+                        curAbut.WriteData(ref Record, curBridge.Name);
+                    }
+                    else
+                    {
+                        Globals.BeamType curBT = GetBeamType(i, ref curBridge);
+                        GetSupStr(out curSupStr, curBridge.SpanList[i - 1], w0, curBT);
+                        int beamNum = GetTBeamNum(w0, curBT);
+                        curSupStr.WriteData(ref Record, curBridge.Name, beamNum);
+
+                        GetPier(out curPier, ref curSupStr, h0);
+                        if (curPier != null)
+                        {
+                            if (curPier.GetType() == typeof(SolidCirclePier))
+                            {
+                                curPier.WriteData(ref Record, curBridge.Name, 3);
+                            }
+                            else
+                            {
+                                curPier.WriteData(ref Record, curBridge.Name);
+                            }
+
+
+                            GetCapBeam(out CapBeam curCB, w0);
+                            curCB.WriteData(ref Record, curBridge.Name);
+
+                            GetPileCap(out PileCap curPC, ref curSupStr, ref curPier);
+                            curPC.WriteData(ref Record, curBridge.Name);
+
+
+                            GetPile(out Pile curPile, curBridge.ZH);
+                            curPile.WriteData(ref Record, curBridge.Name);
+                        }
+                    }
+                }
             }
         }
 
@@ -398,39 +404,80 @@ namespace Configuration
 
         public override double GetBridgeWidth(double pks,bool isleft=true)
         {
-            if (pks <= 164200)
+            if (isleft)
             {
-                if (((pks >= 151889) && (pks < 155701)) || ((pks >= 161245) && (pks < 163569)))
+                if (pks <= 164200)
                 {
-                    return 18.15;
+                    if (((pks >= 154621) && (pks < 156136)) || ((pks >= 162423) && (pks < 163671)))
+                    {
+                        return 18.15;
+                    }
+                    else
+                    {
+                        return 14.65;
+                    }
+                }
+                else if (pks <= 222300)
+                {
+                    if (((pks >= 179000) && (pks < 182320)) || ((pks >= 218396) && (pks < 221001)))
+                    {
+                        return 17.15;
+                    }
+                    else
+                    {
+                        return 13.65;
+                    }
                 }
                 else
                 {
-                    return 14.65;
+                    if (((pks >= 224071) && (pks < 225571)) || ((pks >= 226983) && (pks < 228408)) || ((pks >= 238381) && (pks < 240602)))
+                    {
+                        return 18.15;
+                    }
+                    else
+                    {
+                        return 14.65;
+                    }
                 }
-            }
-            else if (pks <= 222300)
-            {
-                if (((pks >= 164722) && (pks < 166558)) || ((pks >= 171812) && (pks < 174400)) || ((pks >= 176545) && (pks < 179767)) || ((pks >= 187691) && (pks < 190246.869)) || ((pks >= 191520) && (pks < 193075)) || ((pks >= 195015) && (pks < 196035)) || ((pks >= 196720) && (pks < 199628)) || ((pks >= 200710) && (pks < 206017)) || ((pks >= 207838) && (pks < 217472)))
-                {
-                    return 17.15;
-                }
-                else
-                {
-                    return 13.65;
-                }
+
             }
             else
             {
-                if (((pks >= 223516) && (pks < 225144)) || ((pks >= 226580) && (pks < 228052)) || ((pks >= 229615) && (pks < 231910)) || ((pks >= 234025) && (pks < 239482)) || ((pks >= 247966) && (pks < 252459)))
+                if (pks <= 164200)
                 {
-                    return 18.15;
+                    if (((pks >= 151889) && (pks < 155701)) || ((pks >= 161245) && (pks < 163569)))
+                    {
+                        return 18.15;
+                    }
+                    else
+                    {
+                        return 14.65;
+                    }
+                }
+                else if (pks <= 222300)
+                {
+                    if (((pks >= 164722) && (pks < 166558)) || ((pks >= 171812) && (pks < 174400)) || ((pks >= 176545) && (pks < 179767)) || ((pks >= 187691) && (pks < 190246.869)) || ((pks >= 191520) && (pks < 193075)) || ((pks >= 195015) && (pks < 196035)) || ((pks >= 196720) && (pks < 199628)) || ((pks >= 200710) && (pks < 206017)) || ((pks >= 207838) && (pks < 217472)))
+                    {
+                        return 17.15;
+                    }
+                    else
+                    {
+                        return 13.65;
+                    }
                 }
                 else
                 {
-                    return 14.65;
+                    if (((pks >= 223516) && (pks < 225144)) || ((pks >= 226580) && (pks < 228052)) || ((pks >= 229615) && (pks < 231910)) || ((pks >= 234025) && (pks < 239482)) || ((pks >= 247966) && (pks < 252459)))
+                    {
+                        return 18.15;
+                    }
+                    else
+                    {
+                        return 14.65;
+                    }
                 }
             }
+            
         }
 
         public override int GetTBeamNum(double w0,Globals.BeamType refBT)
