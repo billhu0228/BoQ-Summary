@@ -102,7 +102,7 @@ namespace Configuration
                         curPC.WriteData(ref Record, curBridge.Name);
 
 
-                        GetPile(out Pile curPile, curBridge.ZH);
+                        GetPile(out Pile curPile,ref curPC, curBridge.ZH);
                         curPile.WriteData(ref Record, curBridge.Name);
                     }
                 }                
@@ -111,7 +111,7 @@ namespace Configuration
 
 
 
-        public override void GetPile(out Pile curPile,  double cZH)
+        public override void GetPile(out Pile curPile,ref PileCap pc,  double cZH)
         {
             double ZL = GetZLength(cZH);
 

@@ -21,6 +21,7 @@ namespace BoQCore
         }
 
         readonly public List<Point> PTList;
+                
 
         public DMX(string name, byte[] inputs)
         {
